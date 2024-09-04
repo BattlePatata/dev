@@ -1,0 +1,3 @@
+/home/battlepatata/dev/hydrogen/build/CMakeFiles/hydro.dir
+/home/battlepatata/dev/hydrogen/build/CMakeFiles/edit_cache.dir
+/home/battlepatata/dev/hydrogen/build/CMakeFiles/rebuild_cache.dir
