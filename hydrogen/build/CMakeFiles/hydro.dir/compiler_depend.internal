@@ -3,12 +3,14 @@
 
 CMakeFiles/hydro.dir/src/main.cpp.o
  /home/battlepatata/dev/hydrogen/src/main.cpp
+ /home/battlepatata/dev/hydrogen/src/arena.hpp
  /home/battlepatata/dev/hydrogen/src/generation.hpp
  /home/battlepatata/dev/hydrogen/src/parser.hpp
  /home/battlepatata/dev/hydrogen/src/tokenization.hpp
  /usr/include/alloca.h
  /usr/include/asm-generic/errno-base.h
  /usr/include/asm-generic/errno.h
+ /usr/include/assert.h
  /usr/include/c++/13/backward/binders.h
  /usr/include/c++/13/bit
  /usr/include/c++/13/bits/alloc_traits.h
@@ -84,6 +86,7 @@ CMakeFiles/hydro.dir/src/main.cpp.o
  /usr/include/c++/13/bits/uses_allocator_args.h
  /usr/include/c++/13/bits/utility.h
  /usr/include/c++/13/bits/vector.tcc
+ /usr/include/c++/13/cassert
  /usr/include/c++/13/cctype
  /usr/include/c++/13/cerrno
  /usr/include/c++/13/clocale

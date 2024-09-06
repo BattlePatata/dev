@@ -12,6 +12,7 @@ enum class TokenType {
     ident,
     let,
     eq,
+    plus,
 };
 
 struct Token {
@@ -81,6 +82,11 @@ public:
             }
             else if (std::isspace(peek().value())) {
                 consume();
+                continue;
+            }
+            else if (peek().value() == '+') {
+                consume();
+                tokens.push_back({ .type = TokenType::plus });
                 continue;
             }
             else {

@@ -4,6 +4,7 @@
 #include <optional>
 #include <vector>
 
+#include "./arena.hpp"
 #include "./generation.hpp"
 
 
