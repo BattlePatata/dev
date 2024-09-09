@@ -14,8 +14,11 @@ enum class TokenType {
     eq,
     plus,
     star,
-    sub,
-    div,
+    minus,
+    fslash,
+    open_curly,
+    close_curly,
+    if_,
 };
 
 bool is_bin_op(TokenType type) {
@@ -31,10 +34,10 @@ bool is_bin_op(TokenType type) {
 std::optional<int> bin_prec(TokenType type) {
     switch (type) {
         case TokenType::plus:
-        case TokenType::sub:
+        case TokenType::minus:
             return 0;
         case TokenType::star:
-        case TokenType::div:
+        case TokenType::fslash:
             return 1;
         default:
             return {};
@@ -67,6 +70,10 @@ public:
                 }
                 else if (buf == "let") {
                     tokens.push_back({ .type = TokenType::let });
+                    buf.clear();
+                }
+                else if (buf == "if") {
+                    tokens.push_back({ .type = TokenType::if_ });
                     buf.clear();
                 }
                 else {
@@ -108,11 +115,19 @@ public:
             }
             else if (peek().value() == '-') {
                 consume();
-                tokens.push_back({ .type = TokenType::sub });
+                tokens.push_back({ .type = TokenType::minus });
             }
             else if (peek().value() == '/') {
                 consume();
-                tokens.push_back({ .type = TokenType::div });
+                tokens.push_back({ .type = TokenType::fslash });
+            }
+            else if (peek().value() == '{') {
+                consume();
+                tokens.push_back({ .type = TokenType::open_curly });
+            }
+            else if (peek().value() == '}') {
+                consume();
+                tokens.push_back({ .type = TokenType::close_curly });
             }
             else if (std::isspace(peek().value())) {
                 consume();
