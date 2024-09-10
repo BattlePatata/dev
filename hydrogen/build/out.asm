@@ -22,7 +22,7 @@ _start:
     push rax
     mov rax, 0
     push rax
-    push QWORD [rsp + 0]
+    push QWORD [rsp + 8]
     pop rax
     test rax, rax
     jz label0
