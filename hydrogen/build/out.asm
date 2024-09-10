@@ -20,9 +20,15 @@ _start:
     pop rbx
     div rbx
     push rax
-    mov rax, 0
+    mov rax, 1
+    push rax
+    mov rax, 1
     push rax
     push QWORD [rsp + 8]
+    pop rax
+    pop rbx
+    sub rax, rbx
+    push rax
     pop rax
     test rax, rax
     jz label0
