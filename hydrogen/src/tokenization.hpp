@@ -19,6 +19,8 @@ enum class TokenType {
     open_curly,
     close_curly,
     if_,
+    elif,
+    else_,
 };
 
 bool is_bin_op(TokenType type) {
@@ -73,6 +75,14 @@ public:
                 }
                 else if (buf == "if") {
                     tokens.push_back({ .type = TokenType::if_ });
+                    buf.clear();
+                }
+                else if (buf == "elif") {
+                    tokens.push_back({ .type = TokenType::elif });
+                    buf.clear();
+                }
+                else if (buf == "else") {
+                    tokens.push_back({ .type = TokenType::else_ });
                     buf.clear();
                 }
                 else {

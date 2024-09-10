@@ -4,7 +4,12 @@ let x = 1;
 if (x - 1) {
     exit(69);
 }
+elif (x) {
+    exit(68);
+}
+else {
+    exit(42);
+}
 /*
-exit(42);
-*/
 exit(1);
+*/
