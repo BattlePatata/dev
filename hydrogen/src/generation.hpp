@@ -40,36 +40,44 @@ public:
         struct BinExprVisitor {
             Generator& gen;
             void operator()(const NodeBinExprSub* sub) const {
+                gen.m_output << "    ;; sub\n";
                 gen.gen_expr(sub->rght_hnd_side);
                 gen.gen_expr(sub->lft_hnd_side);
                 gen.pop("rax");
                 gen.pop("rbx");
                 gen.m_output << "    sub rax, rbx\n";
                 gen.push("rax");
+                gen.m_output << "    ;; /sub\n";
             }
             void operator()(const NodeBinExprAdd* add) const {
+                gen.m_output << "    ;; add\n";
                 gen.gen_expr(add->rght_hnd_side);
                 gen.gen_expr(add->lft_hnd_side);
                 gen.pop("rax");
                 gen.pop("rbx");
                 gen.m_output << "    add rax, rbx\n";
                 gen.push("rax");
+                gen.m_output << "    ;; /add\n";
             }
             void operator()(const NodeBinExprMulti* multi) const {
+                gen.m_output << "    ;; multi\n";
                 gen.gen_expr(multi->rght_hnd_side);
                 gen.gen_expr(multi->lft_hnd_side);
                 gen.pop("rax");
                 gen.pop("rbx");
                 gen.m_output << "    mul rbx\n";
                 gen.push("rax");
+                gen.m_output << "    ;; /multi\n";
             }
             void operator()(const NodeBinExprDiv* div) const {
+                gen.m_output << "    ;; div\n";
                 gen.gen_expr(div->rght_hnd_side);
                 gen.gen_expr(div->lft_hnd_side);
                 gen.pop("rax");
                 gen.pop("rbx");
                 gen.m_output << "    div rbx\n";
                 gen.push("rax");
+                gen.m_output << "    ;; /div\n";
             }
         };
         BinExprVisitor visitor { .gen = *this };
@@ -103,6 +111,7 @@ public:
             Generator& gen;
             const std::string& end_label;
             void operator()(const NodeIfPredElif* elif) const {
+                gen.m_output << "    ;; elif\n";
                 gen.gen_expr(elif->expr);
                 gen.pop("rax");
                 const std::string label = gen.create_label();
@@ -114,6 +123,7 @@ public:
                     gen.m_output << label << ":\n";
                     gen.gen_if_pred(elif->pred.value(), end_label);
                 }
+                gen.m_output << "    ;; /elif\n";
             }
             void operator()(const NodeIfPredElse* else_) const {
                 gen.gen_scope(else_->scope);
@@ -127,12 +137,15 @@ public:
         struct StmtVisitor {
             Generator& gen;
             void operator()(const NodeStmtExit* stmt_exit) const {
+                gen.m_output << "    ;; exit\n";
                 gen.gen_expr(stmt_exit->expr);
                 gen.m_output << "    mov rax, 60\n";
                 gen.pop("rdi");
                 gen.m_output << "    syscall\n";
+                gen.m_output << "    ;; /exit\n";
             }
             void operator()(const NodeStmtLet* stmt_let) const {
+                gen.m_output << "    ;; let\n";
                 if (std::ranges::find_if(std::as_const(gen.m_vars), [&](const Var& var) {
                         return var.name == stmt_let->ident.value.value();
                     }) != gen.m_vars.cend()) {
@@ -142,23 +155,44 @@ public:
 
                 gen.m_vars.push_back({ .name = stmt_let->ident.value.value(), .stack_loc = gen.m_stack_size });
                 gen.gen_expr(stmt_let->expr);
+                gen.m_output << "    ;; /let\n";
+            }
+            void operator()(const NodeStmtAssign* stmt_assign) const {
+                const auto it = std::ranges::find_if(gen.m_vars, [&](const Var& var) {
+                    return var.name == stmt_assign->ident.value.value();
+                });
+                if (it == gen.m_vars.end()) {
+                    std::cerr << "Undeclared identifier: " << stmt_assign->ident.value.value() << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                gen.gen_expr(stmt_assign->expr);
+                gen.pop("rax");
+                gen.m_output << "    mov [rsp + " << (gen.m_stack_size - it->stack_loc - 1) * 8 << "], rax\n";
             }
             void operator()(const NodeScope* scope) const {
+                gen.m_output << "    ;; scope\n";
                 gen.gen_scope(scope);
+                gen.m_output << "    ;; /scope\n";
             }
             void operator()(const NodeStmtIf* stmt_if) const {
+                gen.m_output << "    ;; if\n";
                 gen.gen_expr(stmt_if->expr);
                 gen.pop("rax");
                 const std::string label = gen.create_label();
                 gen.m_output << "    test rax, rax\n";
                 gen.m_output << "    jz " << label << "\n";
                 gen.gen_scope(stmt_if->scope);
-                gen.m_output << label << ":\n";
                 if (stmt_if->pred.has_value()) {
                     const std::string end_label = gen.create_label();
-                    gen.gen_if_pred(stmt_if->pred.value(), label);
+                    gen.m_output << "    jmp " << end_label << "\n";
+                    gen.m_output << label << ":\n";
+                    gen.gen_if_pred(stmt_if->pred.value(), end_label);
                     gen.m_output << end_label << ":\n";
                 }
+                else {
+                    gen.m_output << label << ":\n";
+                }
+                gen.m_output << "    ;; /if\n";
             }
         };
         StmtVisitor visitor { .gen = *this };
